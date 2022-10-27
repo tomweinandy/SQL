@@ -1,0 +1,3 @@
+-- Quick reference
+* left(var, n) selects the first n characters in var
+* syntax for multiple CTEs: with cte1 as (query1), cte2 as (query2)
