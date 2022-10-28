@@ -144,8 +144,41 @@ where f1.x = f2.y and f1.y = f2.x   -- symmetry!
 and f1.id <> f2.id   -- but not symmetric with itself
 and f1.x <= f1.y
 ------------------------------------------------------------------------------------------------------------------------
-----  ----
+---- Interviews ----
+-- Samantha interviews many candidates from different colleges using coding challenges and contests. Write a query to print the contest_id, hacker_id, name, and the sums of total_submissions, total_accepted_submissions, total_views, and total_unique_views for each contest sorted by contest_id. Exclude the contest from the result if all four sums are .
+select
+    con.contest_id,
+    con.hacker_id,
+    name,
+    coalesce(sum(totalsubmissions), 0) as total_s,
+    coalesce(sum(totalacceptedsubmissions), 0),
+    coalesce(sum(totalviews), 0) as total_v,
+    coalesce(sum(totaluniqueviews), 0)
+from contests as con
+join colleges as col on con.contest_id = col.contest_id
+join challenges as cha on col.college_id = cha.college_id
 
+left join (
+    select
+        challenge_id,
+        coalesce(sum(total_views), 0) as totalviews,
+        coalesce(sum(total_unique_views), 0) as totaluniqueviews
+    from view_stats
+    group by challenge_id
+) as v on cha.challenge_id = v.challenge_id
+
+left join (
+    select
+        challenge_id,
+        coalesce(sum(total_submissions), 0) as totalsubmissions,
+        coalesce(sum(total_accepted_submissions), 0) as totalacceptedsubmissions
+    from submission_stats
+    group by challenge_id
+) as s on cha.challenge_id = s.challenge_id
+
+group by con.contest_id, con.hacker_id, name
+-- where total_s <> 0 and total_v <> 0
+order by con.contest_id
 ------------------------------------------------------------------------------------------------------------------------
 ----  ----
 
